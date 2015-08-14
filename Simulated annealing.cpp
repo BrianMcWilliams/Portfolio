@@ -1,7 +1,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
-
+//Brian McWilliams
+//UQAC 2015
 using namespace std;
 
 struct job{ //Structure for the lists of jobs we'll be using;
