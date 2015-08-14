@@ -29,25 +29,52 @@ struct job{
 	int t1; //Time to execute on the first machine
 	int t2; //Time to execute on the second machine
 };
-int inputJobs(job* jobTable,int nbJobs){
-	
+void generateSchedule(job* jobTable, int nbJobs){
+	for (int i = 0; i < nbJobs; i++){
+		jobTable[i].t1 = rand() % 40;
+		jobTable[i].t2 = rand() % 40;
+	}
+	return;
+}
+void inputJobs(job* jobTable, int nbJobs){
+
 	int time; //Variable used for input
-
-	
-	for (int i = 0; i < nbJobs; i++){ //For every job, input the processing time on M1, M2
-
-		cout << "For job " << i << "please enter t1 : ";  //Ask for t1
-		cin >> time;
-		jobTable[i].t1 = time;
-		cout << endl << "please enter t2 : " << endl; //Ask for t2
-		cin >> time;
-		jobTable[i].t2 = time;
+	int choice = 0;
+	cout << "press 1 to generate a random schedule,  press 2 " << endl;
+	cin >> choice;
+	if (choice == 1){
+		generateSchedule(jobTable, nbJobs);
 	}
-	cout << "here are the jobs currently entered" << endl;
-	for (int i = 0; i < nbJobs; i++){ //For every job, input the processing time on M1, M2
-		cout << "Job " << i << "|| t1 : " << jobTable[i].t1 << " t2 : " << jobTable[i].t2 << endl; //Ask for t2
+	else{
+		for (int i = 0; i < nbJobs; i++){ //For every job, input the processing time on M1, M2
+
+			cout << "For job " << i << "please enter t1 : ";  //Ask for t1
+			cin >> time;
+			jobTable[i].t1 = time;
+			cout << endl << "please enter t2 : " << endl; //Ask for t2
+			cin >> time;
+			jobTable[i].t2 = time;
+		}
+		cout << "here are the jobs currently entered" << endl;
+		for (int i = 0; i < nbJobs; i++){ //For every job, input the processing time on M1, M2
+			cout << "Job " << i << "|| t1 : " << jobTable[i].t1 << " t2 : " << jobTable[i].t2 << endl; //Ask for t2
+		}
 	}
-	return nbJobs;
+	return;
+}
+int makeSpan(job* jobTable, int nbJobs){
+	int C1 = 0;
+	int C2 = 0;
+	for (int i = 0; i<nbJobs; i++){
+		C1 = C1 + jobTable[i].t1;
+		if (C1 < C2){
+			C2 = C2 + jobTable[i].t2;
+		}
+		else{
+			C2 = C1 + jobTable[i].t1;
+		}
+	}
+	return C2;
 }
 int findMinimum(job* selected){ //Returns minimum value for a job (either t1 or t2 value)
 	if (selected->t1 > selected->t2){
@@ -64,7 +91,7 @@ void quickSort(job* jobTable, int left, int right) { //Quicksort algorithm adapt
 	job tmp; //Temporary job to allow us to switch jobs around
 	job* pivot = &jobTable[(left + right) / 2]; // Points to the pivot 
 	min_piv = findMinimum(pivot);
-	while (i <= j) { 
+	while (i <= j) {
 		leftJob = &jobTable[i]; //Initialise leftJob
 		min_cur = findMinimum(leftJob);
 		while (min_cur < min_piv){ //While left jobs are smaller than the pivot value
@@ -96,13 +123,13 @@ void quickSort(job* jobTable, int left, int right) { //Quicksort algorithm adapt
 		quickSort(jobTable, i, right);
 }
 void jobSort(job* jobTable, int length){ //Takes the table and length and calls quicksort
-	quickSort(jobTable,0,length-1);
+	quickSort(jobTable, 0, length - 1);
 }
 
 int main(void){
 
 	/******INPUT*******
-	* 
+	*
 	* I'm going to simply have the user input the number of jobs to treat and then input the comput ation time for each of them.
 	* Once again, not wasting energy on small details regarding how the jobs will be fed into the system, we're focusing on the algorithm
 	*
@@ -114,8 +141,8 @@ int main(void){
 
 	job* jobTable = new job[nbJobs]; //Create a table to house the jobs'
 
-	nbJobs = inputJobs(jobTable,nbJobs);
-	jobSort(jobTable,nbJobs);
+	inputJobs(jobTable, nbJobs);
+	jobSort(jobTable, nbJobs);
 	cout << "here are the jobs currently entered" << endl;
 	for (int i = 0; i < nbJobs; i++){ //For every job, input the processing time on M1, M2
 		cout << "Job " << i << "|| t1 : " << jobTable[i].t1 << " t2 : " << jobTable[i].t2 << endl; //Ask for t2
@@ -145,5 +172,6 @@ int main(void){
 	for (int i = 0; i < nbJobs; i++){ //For every job, input the processing time on M1, M2
 		cout << "JobSchedule " << i << "|| t1 : " << jobSchedule[i].t1 << " t2 : " << jobSchedule[i].t2 << endl; //Ask for t2
 	}
+	cout << "makespan : " << makeSpan(jobSchedule, nbJobs) << endl;
 	system("pause");
 }
