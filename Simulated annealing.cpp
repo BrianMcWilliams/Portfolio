@@ -46,7 +46,7 @@ int findMaximum(int* table, int size){ //Function returns the position of the ma
 	}
 	return pos;
 }
-int makeSpan(job* schedule,int* centre1, int* centre2, int nb_machines1, int nb_machines2){ //Function to calculate the makespan of the current schedule, we give it the list of jobs in the scheduled order and two integer values, corresponding to the # of processing cores per machine centre.
+int makeSpan(job* schedule, int* centre1, int* centre2, int nb_machines1, int nb_machines2){ //Function to calculate the makespan of the current schedule, we give it the list of jobs in the scheduled order and two integer values, corresponding to the # of processing cores per machine centre.
 
 	job* current; //Current position in my list of jobs taken as a parameter (schedule);
 	int pos_c1, pos_c2;
@@ -69,7 +69,7 @@ int makeSpan(job* schedule,int* centre1, int* centre2, int nb_machines1, int nb_
 		else{
 			centre2[pos_c2] = centre1[pos_c1] + current->M2; //When the maximum is on Centre 1, use the time on centre1[pos_c1] for makespan;
 		}
-		current = current->next;		
+		current = current->next;
 	}
 	int ret_value = centre2[findMaximum(centre2, nb_machines2)];
 	return ret_value;
@@ -126,29 +126,29 @@ job* copySchedule(job* job_head){
 	job* cur = mod_head;
 	return mod_head;
 }
-job* modifySchedule(job* job_head,int nb_jobs){ //The modify schedule function uses a random number to swap two elements of the list.
+job* modifySchedule(job* job_head, int nb_jobs){ //The modify schedule function uses a random number to swap two elements of the list.
 	job* neighbour = copySchedule(job_head); //We copy the schedule and allocate it to our neighbour pointer. neighbour being the 
 	job* temporary = new job;                        //a slightly modified version of the original
-		int pos_1 = rand() % nb_jobs; //Both of these integers are determined by a random number generator;
-		int pos_2 = rand() % nb_jobs;
-		int current_pos = 0;
-		job* job_pos_1 = neighbour;
-		job* job_pos_2 = neighbour;
-		while (current_pos < pos_1){ //Point to both elements we're going to swap;
-			current_pos++;
-			job_pos_1 = job_pos_1->next; //We don't need to check to make sure that this pointed could be undefined because the integer pos_1 will always be smaller than the number of jobs in the schedule;
-		}
-		current_pos = 0;
-		while (current_pos < pos_2){
-			current_pos++;
-			job_pos_2 = job_pos_2->next;// read above ^ 
-		}
-		temporary->M1 = job_pos_1->M1; //Swap both elements;
-		temporary->M2 = job_pos_1->M2;
-		job_pos_1->M1 = job_pos_2->M1;
-		job_pos_1->M2 = job_pos_2->M2;
-		job_pos_2->M1 = temporary->M1;
-		job_pos_2->M2 = temporary->M2;
+	int pos_1 = rand() % nb_jobs; //Both of these integers are determined by a random number generator;
+	int pos_2 = rand() % nb_jobs;
+	int current_pos = 0;
+	job* job_pos_1 = neighbour;
+	job* job_pos_2 = neighbour;
+	while (current_pos < pos_1){ //Point to both elements we're going to swap;
+		current_pos++;
+		job_pos_1 = job_pos_1->next; //We don't need to check to make sure that this pointed could be undefined because the integer pos_1 will always be smaller than the number of jobs in the schedule;
+	}
+	current_pos = 0;
+	while (current_pos < pos_2){
+		current_pos++;
+		job_pos_2 = job_pos_2->next;// read above ^ 
+	}
+	temporary->M1 = job_pos_1->M1; //Swap both elements;
+	temporary->M2 = job_pos_1->M2;
+	job_pos_1->M1 = job_pos_2->M1;
+	job_pos_1->M2 = job_pos_2->M2;
+	job_pos_2->M1 = temporary->M1;
+	job_pos_2->M2 = temporary->M2;
 
 	return neighbour;
 }
@@ -156,7 +156,7 @@ job* modifySchedule(job* job_head, int nb_jobs, bool wide_search){ //The modify 
 	job* cur = job_head;
 	job* neighbour = copySchedule(job_head); //We copy the schedule and allocate it to our neighbour pointer. neighbour being the 
 	job* temporary = new job;                        //a slightly modified version of the original
-	int nb_iterations = 50* nb_jobs;
+	int nb_iterations = 50 * nb_jobs;
 	for (int i = 0; i < nb_iterations; i++){
 		int pos_1 = rand() % nb_jobs; //Both of these integers are determined by a random number generator;
 		int pos_2 = rand() % nb_jobs;
@@ -219,54 +219,39 @@ int main(void){
 	cin >> nb_machines2;
 	int* centre1 = new int[nb_machines1];
 	int* centre2 = new int[nb_machines2];
-	int old_cost = makeSpan(job_head,centre1,centre2, nb_machines1, nb_machines2);
-	cout << " original : " << old_cost; 
+	int old_cost = makeSpan(job_head, centre1, centre2, nb_machines1, nb_machines2);
+	cout << " original : " << old_cost;
 	int lowest = old_cost;
 	int original_cost = old_cost;
-		for (int j = 0; j<5; j++){
-			float temperature =0.005;
-			neighbour = modifySchedule(job_head, nb_jobs, true);
-			deleteList(job_head);
-			job_head = neighbour;
-			old_cost = makeSpan(job_head,centre1,centre2, nb_machines1, nb_machines2);
-			while (temperature > temp_min){
-				for (int i = 0; i < 10000; i++){
-					neighbour = modifySchedule(job_head, nb_jobs);
-					new_cost = makeSpan(neighbour,centre1,centre2, nb_machines1, nb_machines2);
-					if (new_cost < lowest){ lowest = new_cost; deleteList(best_head); best_head = copySchedule(neighbour); cout << " New lowest : " << makeSpan(best_head,centre1,centre2, nb_machines1, nb_machines2) << endl; }
-					if (acceptDecision(old_cost - new_cost, temperature)){
-						deleteList(job_head);
-						job_head = neighbour;
-						old_cost = new_cost;
-					}
-					else{
-						deleteList(neighbour);
-					}
-					i++;
+
+		float temperature = 100;
+
+		while (temperature > temp_min){
+			for (int i = 0; i < 10000; i++){
+				neighbour = modifySchedule(job_head, nb_jobs);
+				new_cost = makeSpan(neighbour, centre1, centre2, nb_machines1, nb_machines2);
+				if (new_cost < lowest){ lowest = new_cost; deleteList(best_head); best_head = copySchedule(neighbour); }
+				if (acceptDecision(old_cost - new_cost, temperature)){
+					deleteList(job_head);
+					job_head = neighbour;
+					old_cost = new_cost;
 				}
-				temperature = temperature * 0.85;
-				cout << "new temperature : " << temperature << endl;
+				else{
+					deleteList(neighbour);
+				}
+				i++;
 			}
-		}
-		job* current_final = original;
-		for (int i = 0; i < nb_jobs; i++){
-			cout << " M1 : " << current_final->M1 << " M2 : " << current_final->M2 << endl;
-			current_final = current_final->next;
-		}
-		cout << " ************************************************* " << endl;
-		current_final = best_head;
-		for (int i = 0; i < nb_jobs; i++){
-			cout << " M1 : " << current_final->M1 << " M2 : " << current_final->M2 << endl;
-			current_final = current_final->next;
+			temperature = temperature * 0.85;
+			cout << "new temperature : " << temperature << endl;
 		}
 
-		for (int i = 0; i < nb_machines1; i++){
-			cout << "centre1[" << i << "] : " << centre1[i] << endl;
-		}
-		for (int i = 0; i < nb_machines2; i++){
-			cout << "centre2[" << i << "] : " << centre2[i] << endl;
-		}
+	job* current_final = best_head;
+	for (int i = 0; i < nb_jobs; i++){
+		cout << " M1 : " << current_final->M1 << " M2 : " << current_final->M2 << endl;
+		current_final = current_final->next;
+	}
+
 	optimisation = original_cost - old_cost;
-	cout << "Initial makespan : " << original_cost << " Optimal makespan : " << old_cost << " || Optimisation : " << optimisation << endl;
+	cout << " Optimal makespan : " << old_cost << endl;
 	system("pause");
 }
